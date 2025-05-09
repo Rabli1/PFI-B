@@ -1,0 +1,41 @@
+﻿
+@model PhotosManager.Models.Photo
+@{
+    var user = ((PhotosManager.Models.User)Session["ConnectedUser"]);
+
+    bool userLike = PhotosManager.Models.DB.Likes.ToList().Exists(l => (l.PhotoId == Model.Id && l.UserId == user.Id));
+    bool userComment = PhotosManager.Models.DB.Comments.ToList().Exists(l => (l.PhotoId == Model.Id && l.OwnerId == user.Id));
+
+    string photoLikedByConnectedUser = userLike ? "fa" : "fa-regular";
+    string photoCommentByConnectedUser = userComment ? "fa-solid" : "fa-regular";
+
+}
+
+<div id="PhotoDetails">
+    <div class="photoDetailsOwner">
+        <div class="UserSmallAvatar" style="background-image:url('@Model.Owner.Avatar')" title="@Model.Owner.Name"></div>
+        @Model.Owner.Name
+    </div>
+    <hr>
+    <div class="photoDetailsTitle">@Model.Title</div>
+    <a href="@Model.Image" target="_blank">
+        <img src="@Model.Image" class="photoDetailsLargeImage">
+    </a>
+    <div class="photoDetailsCreationDate">
+        @Helper.When(Model.CreationDate, true)
+        <div class="likesSummary">
+            @Model.Comments.Count()
+            <i class=" cmdIconSmall @photoCommentByConnectedUser fa-comment" title="@Model.UsersCommentList"></i>
+
+            @Model.Likes.Count()
+            <div style="font-size:1.1em"
+                 class="cmdIconSmall @photoLikedByConnectedUser fa-thumbs-up"
+                 id="addRemoveLikeCmd"
+                 photoId="@Model.Id"
+                 title="@Html.Raw(Model.UsersLikesList)">
+            </div>
+        </div>
+
+    </div>
+    <div class="photoDetailsDescription">@Model.Description</div>
+</div>

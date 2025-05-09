@@ -1,0 +1,39 @@
+﻿@model IEnumerable<PhotosManager.Models.User>
+
+@foreach (var item in Model)
+{
+    if (item.Id != 1)
+    {
+        bool isOnline = item.Online;
+        string statusIcon = "/content/UI-Images/OffLine.png";
+        if (item.Blocked) { statusIcon = "/content/UI-Images/Masked.png"; }
+        else { if (item.Online) { statusIcon = "/content/UI-Images/OnLine.png"; } }
+        string verifiedIcon = item.Verified ? "" : "/content/UI-Images/Abort.png";
+        string userTypeIcon = item.Admin ? "/content/UI-Images/admin.png" : "/content/UI-Images/power_user.png";
+        string promoteTitle = item.Admin ? "Retirer les droits Administrateur de " : "Donner les droits Administrateur à ";
+        <div class="UserPanel" style="display:grid;grid-template-columns:180px 30px 50px 30px auto;align-items:center;margin:8px;font-size:14px;">
+            <div style="display:flex; align-items:center; gap:8px; cursor:default">
+                @Helper.Image(item.Avatar, "smallAvatar")
+                <span title="@item.Email">@item.Name</span>
+            </div>
+            <div class="blockCmd icon" style="text-align:center" userId="@item.Id" title="@(item.Blocked ? "Débloquer " : "Bloquer") le compte de l'usager @item.Name">
+                @Helper.Image(@statusIcon, "xsmallAvatar")
+            </div>
+            <div class="promoteCmd icon" userId="@item.Id" title="@promoteTitle l'usager @item.Name">
+                @Helper.Image(@userTypeIcon, "smallAvatar")
+            </div>
+            <div class="@(item.Verified ? "" : "forceVerifyCmd")" userId="@item.Id" title="@(item.Verified ? "Compte vérifié" : "Compte non vérifié, forcer la vérification")">
+                @Helper.Image(@verifiedIcon, "xsmallAvatar")
+            </div>
+            @if (!item.Admin)
+            {
+                <div class="deleteCmd icon fa fa-trash" title="Effacer l'usager @item.Name" userId="@item.Id"></div>
+            }
+            else
+            {
+                <div></div>
+            }
+        </div>
+    }
+}
+

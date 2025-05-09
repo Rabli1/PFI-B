@@ -1,0 +1,56 @@
+﻿.event-form {
+    max-width: 320px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+}
+
+.profil-form {
+    max-width: 320px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+}
+
+.event-form input {
+    margin-top: 8px;
+    width: 100%;
+}
+
+.profil-form input {
+    margin-top: 8px;
+    width: 100%;
+}
+
+
+fieldset {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-align: left;
+}
+
+legend {
+    transform: translate(0, -27px);
+    font-size: 17px;
+    font-weight: 500;
+    color: #777;
+    margin-bottom: -27px !important;
+    width: auto;
+    padding: 2px;
+    background-color: #fff;
+}
+
+.passwordLayout {
+    display: grid;
+    grid-template-columns: auto 0px;
+}
+
+.passwordShowIcon {
+    transform: translate(-35px, 15px);
+    cursor: pointer;
+}

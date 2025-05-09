@@ -1,0 +1,52 @@
+﻿
+@model PhotosManager.Models.User
+@{
+    bool subscribing = Model.Id == 0;
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="profil-form">
+        <fieldset>
+            <legend>@Html.DisplayNameFor(model => model.Name)</legend>
+            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Name) } })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+        </fieldset>
+        <fieldset>
+            <legend>@Html.DisplayNameFor(model => model.Email)</legend>
+            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Email) } })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+
+            @Html.EditorFor(model => model.ConfirmEmail, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.ConfirmEmail) } })
+            @Html.ValidationMessageFor(model => model.ConfirmEmail, "", new { @class = "text-danger" })
+        </fieldset>
+        <fieldset>
+            <legend>@Html.DisplayNameFor(model => model.Password)</legend>
+            <div style="display:grid; grid-template-columns:auto 15px; gap:6px">
+                @if (!subscribing)
+                {
+                    <label for="changePassword" class="" style="text-align:right;">
+                        Modifier
+                    </label>
+                    <input type="checkbox" name="changePassword" id="changePassword" class="formform-check-inputcontrol" />
+
+                }
+            </div>
+
+            <div class="passwordLayout">
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control", placeholder = @Html.DisplayNameFor(model => model.Password) } })
+                @Helper.Icon("toggleShowPassword", "passwordShowIcon fa-eye", "Afficher/Masquer le mot de passe")
+            </div>
+            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+
+            @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.ConfirmEmail) } })
+            @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+        </fieldset>
+        <fieldset>
+            <legend>Avatar</legend>
+            @Helper.ImageUploader("Avatar", Model.Avatar, "Cliquez glisser une photo")
+        </fieldset>
+
+    </div>
+}

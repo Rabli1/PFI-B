@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Email Changed";
+    string title = ViewBag.AlertTitle;
+    string message = ViewBag.AlertMessage;
+}
+
+<h2>@title</h2>
+<hr />
+<div style="font-size:18px">
+    @message
+</div>
+<br />
+@Html.ActionLink("Connexion", "Login")

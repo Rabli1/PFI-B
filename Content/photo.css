@@ -1,0 +1,219 @@
+﻿body {
+}
+
+.photosLayout {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 360px);
+    gap: 10px;
+    padding: 5px;
+    padding-top: 0px;
+}
+
+.photoLayout {
+    /* scroll-snap-align: start; */
+    margin: 0px;
+    padding-top: 0px;
+}
+
+.photoImage {
+    display: flex;
+    gap: 5px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 360px;
+    height: 270px;
+    border-radius: 9px;
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+
+    .photoImage:hover {
+        box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 16px, rgba(0, 0, 0, 0.5) 0px 8px 32px;
+    }
+
+.photoTitleContainer {
+    height: 40px;
+    display: grid;
+    grid-template-columns: auto 25px 25px;
+    align-items: center;
+    cursor: default;
+}
+
+
+.photoTitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(0, 87, 204);
+}
+
+.photoDetailsOwner {
+    display: grid;
+    grid-template-columns: 50px auto;
+    margin: 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+    align-items: center;
+    gap: 5px;
+}
+
+.photoDetailsTitle {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 5px;
+}
+
+.photoDetailsDescription {
+    color: black;
+    font-size: 1.2em;
+    margin: 5px;
+    text-align: justify;
+}
+
+.photoDetailsCreationDate {
+    color: dodgerblue;
+    margin: 5px;
+}
+
+.photoDetailsLargeImage {
+    width: 100%;
+    object-fit: cover;
+    padding: 5px;
+}
+
+.likesSummary {
+    display: grid;
+    grid-template-columns: 88px 30px 30px 30px;
+    align-items: center;
+    text-align: right;
+}
+
+.photoCreationDate {
+    font-size: 1em !important;
+    color: dodgerblue;
+    display: grid;
+    grid-template-columns: auto 180px;
+    align-items: center;
+}
+
+.photoDetailsCreationDate {
+    color: dodgerblue;
+    margin: 5px;
+    display: grid;
+    grid-template-columns: auto 180px;
+    align-items: center;
+}
+
+.photoDetailsLargeImage {
+    width: 100%;
+    object-fit: cover;
+    padding: 5px;
+}
+
+.photDetailsLink {
+    text-decoration: none;
+}
+
+.transparentBackground {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.photo-form {
+    max-width: 470px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+    align-content: center;
+}
+
+    .photo-form fieldset {
+        width: 100% !important;
+    }
+
+    .photo-form input, textarea {
+        margin-top: 8px;
+        width: 100% !important;
+    }
+
+.commentsSection {
+    margin-left: -50px;
+}
+
+.commentLayout {
+    display: grid;
+    grid-template-columns: 50px auto;
+    align-items: flex-start;
+    margin: 8px;
+}
+
+
+.newCommentLayout {
+    display: grid;
+    grid-template-columns: 50px auto;
+    align-items: flex-start;
+    margin: 8px;
+}
+
+.editCommentLayout {
+    display: grid;
+    grid-template-columns: 50px auto;
+    align-items: flex-start;
+    margin: 8px;
+}
+
+divx {
+    border: 1px solid red;
+}
+
+.responseLayout {
+    display: grid;
+    grid-template-columns: 50px auto;
+    align-items: flex-start;
+    margin: 8px;
+    padding-left: 50px;
+}
+
+.commentsLayout {
+    padding-left: 50px;
+}
+
+.commentFooter {
+    font-size: 0.85em;
+    display: grid;
+    grid-template-columns: auto 20px;
+    align-items: center;
+    padding: 3px;
+}
+
+.commentSubFooter {
+    font-size: 1em;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 3px;
+    gap: 15px;
+}
+
+.editCommentFooter {
+    font-size: 1em;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 3px;
+    gap: 15px;
+    padding: 5px;
+}
+
+.textComment {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin: 3px;
+    min-height: 40px;
+    padding: 6px;
+}
+
+.contentImage {
+    width: 100%;
+}

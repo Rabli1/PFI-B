@@ -1,0 +1,86 @@
+﻿
+@model IEnumerable<PhotosManager.Models.Comment>
+@{
+    var user = ((PhotosManager.Models.User)Session["ConnectedUser"]);
+    int currentPhotoId = (int)Session["currentPhotoId"];
+    int currentCommentId = 0;
+}
+<div class="commentsLayout">
+    @if (Model.Count() > 0)
+    {
+        foreach (var comment in Model)
+        {
+            currentCommentId = comment.Id;
+            bool userLike = PhotosManager.Models.DB.Likes.ToList().Exists(l => (l.CommentId == comment.Id && l.UserId == user.Id));
+            string commentLikedByConnectedUser = userLike ? "fa" : "fa-regular";
+
+            <!-- Comment rendering -->
+            <div class="commentLayout" commentId="@comment.Id">
+
+                <div class="UserSmallAvatar" style="background-image:url('@comment.Owner.Avatar')" title="@comment.Owner.Name"></div>
+                <div class="textComment">@Helper.ParseContent(comment.Text)</div>
+
+                <div><!--spacer--></div>
+                <div class="commentFooter">
+                    @Helper.When(comment.CreationDate)
+                    <div class="commentSubFooter">
+                        @comment.Likes.Count()
+                        <i class="cmdIconSmall @commentLikedByConnectedUser fa-thumbs-up" title="@comment.UsersLikesList" commentId="@comment.Id"></i>
+                        <!-- Only owner can edit this comment -->
+                        @if (comment.Owner.Id == user.Id)
+                        {
+                            <!-- Edit comment command icon -->
+                            <i class="editCommentCmd cmdIconSmall fa fa-edit" commentId="@comment.Id"></i>
+                        }
+                        <!-- Create response command icon -->
+                        <i class="CreateResponseCommentCmd cmdIconSmall fa-regular fa-comment" parentId="@comment.Id" title="Répondre/commenter"></i>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Only owner can edit this comment -->
+            if (comment.Owner.Id == user.Id)
+            {
+                <!-- Hidden programmatically edit comment UI -->
+                <div class="editCommentLayout" id="@comment.Id" userId="@user.Id" ownerId="@comment.Owner.Id">
+
+                    <div class="UserSmallAvatar" style="background-image:url('@comment.Owner.Avatar')" title="@comment.Owner.Name"></div>
+                    <textarea class="form-control" rows="1" placeholder="répondre">@comment.Text</textarea>
+
+                    <div><!--spacer--></div>
+                    <div class="editCommentFooter">
+                        <div></div>
+                        <!-- Commit update command icon -->
+                        <span class="updateCommentCmd cmdIconSmall fa fa-check" cmdCommentId="@comment.Id"></span>
+                        <!-- Abort update command icon -->
+                        <span class="abortEditCommentCmd cmdIconSmall fa fa-times" cmdCommentId="@comment.Id"></span>
+                        <!-- Delete command icon -->
+                        <span class="deleteCommentCmd cmdIconSmall fa fa-trash" cmdCommentId="@comment.Id"></span>
+                    </div>
+
+                </div>
+            }
+
+            <!-- Render comment responses (recursive)-->
+            Html.RenderAction("Comments", "Photos", new { photoId = comment.PhotoId, parentId = comment.Id });
+
+            <!-- Hidden programmatically create response comment UI -->
+            <div class="responseLayout" photoId="@currentPhotoId" createResponseparentId="@currentCommentId">
+
+                <div class="UserSmallAvatar" style="background-image:url('@user.Avatar')" title="@user.Name"></div>
+                <textarea class="form-control" rows="1" placeholder="répondre"></textarea>
+
+                <div><!--spacer--></div>
+                <div class="editCommentFooter">
+                    <div><!--spacer--></div>
+                    <!-- Commit create command icon -->
+                    <span class="createResponseCmd cmdIconSmall fa fa-check" parentId="@currentCommentId"></span>
+                    <!-- Abort update command icon -->
+                    <span class="abortCreateResponseCmd fa fa-times" parentId="@currentCommentId"></span>
+                </div>
+
+            </div>
+        }
+    }
+</div>

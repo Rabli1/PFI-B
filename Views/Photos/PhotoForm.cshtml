@@ -1,0 +1,27 @@
+﻿@model PhotosManager.Models.Photo
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="photo-form">
+
+        <fieldset>
+            <legend>Informations</legend>
+            @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Title) } })
+            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @rows = 5, @placeholder ="Description" })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger error-message" })
+            <div style="display:grid; grid-template-columns:1em auto; gap:8px; align-items:center">
+                @Html.CheckBoxFor(m => m.Shared, new { htmlAttributes = new { @class = "formform-check-inputcontrol" } })
+                <label for="Shared">Partagée</label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Photo</legend>
+            @Helper.ImageUploader("Image", Model.Image, "Cliquez glisser une photo")
+        </fieldset>
+    </div>
+}
+
+

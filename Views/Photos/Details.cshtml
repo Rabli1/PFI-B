@@ -1,0 +1,161 @@
+﻿@{
+    ViewBag.Title = "Détails de photo";
+    int currentPhotoId = (int)Session["currentPhotoId"];
+    var user = ((PhotosManager.Models.User)Session["ConnectedUser"]);
+}
+<div id="DetailsPanel"> <!-- Auto refreshed --></div>
+<hr />
+<!-- Create new comment command icon -->
+<div class="commentFooter ">
+    <h4 style="margin-left:22px;">Commentaires</h4>
+    <div class="commentSubFooter" style="font-size:1em">
+        <i class="newCommentCmd cmdIcon fa-regular fa-comment" style="margin-top:-3px; z-index:1;font-size:1.5em" parentId="0" title="Ajouter un commentaire"></i>
+    </div>
+</div>
+
+<details open style="position:relative; top:-40px;" id="commentDetails">
+    <summary style="border: none; background: none; "></summary>
+
+    <!-- All comments rendering -->
+    <div class="commentsSection" id="commentsSection"> <!-- auto refreshed --> </div>
+
+    <!-- Hidden programmatically new comment UI -->
+    <div class="newCommentLayout" photoId="@currentPhotoId" createCommentparentId="0">
+        <div class="UserSmallAvatar" style="background-image:url('@user.Avatar')" title="@user.Name"></div>
+        <textarea class="form-control" rows="1" placeholder="commenter"></textarea>
+        <div><!--spacer--></div>
+        <div class="editCommentFooter">
+            <div><!--spacer--></div>
+            <!-- Commit create command icon -->
+            <span class="createCommentCmd cmdIconSmall fa fa-check" parentId="0"></span>
+            <!-- Abort update command icon -->
+            <span class="abortCreateCommentCmd cmdIconSmall fa fa-times" parentId="0"></span>
+        </div>
+    </div>
+</details>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        let commentsSection;
+        let scrollAnimationSpeed = 1000;
+        $(() => {
+            detailsPanel = new AutoRefreshedPanel("DetailsPanel", "/Photos/GetDetails", GPRR, detailsPanelAttachEvents);
+            commentsSection = new AutoRefreshedPanel("commentsSection", "/Photos/GetComments", GPRR, commentsSectionAttachEvents);
+        })
+        function detailsPanelAttachEvents() {
+            $("#addRemoveLikeCmd").off();
+            $("#addRemoveLikeCmd").click(function (e) {
+                detailsPanel.command("/Photos/TogglePhotoLike/" + $(this).attr("photoId"));
+                e.preventDefault();
+            });
+        }
+        function commentsSectionAttachEvents() {
+            $("#commentDetails .fa-thumbs-up").off();
+            $("#commentDetails .fa-thumbs-up").click(function (e) {
+                commentsSection.command("/Photos/ToggleCommentLike/" + $(this).attr("commentId"));
+                e.preventDefault();
+            });
+            $(".editCommentLayout").hide();
+            $(".newCommentLayout").hide();
+            $(".responseLayout").hide();
+
+            $(".newCommentCmd").off();
+            $(".newCommentCmd").click(function () {
+                $("#commentDetails").prop('open', true);
+
+                commentsSection.pause();
+                let parentId = $(this).attr("parentId");
+                $(`[createCommentparentId="${parentId}"]`).show();
+                $(`[createCommentparentId="${parentId}"] > textarea`).val("");
+
+                $('#content').animate({
+                    scrollTop: $(`[createCommentparentId="${parentId}"] > textarea`).offset().top
+                }, scrollAnimationSpeed)
+                    .promise()
+                    .done(() => { $(`[createCommentparentId="${parentId}"] > textarea`).focus(); });
+            })
+            $(".abortCreateCommentCmd").off();
+            $(".abortCreateCommentCmd").click(function (event) {
+                event.preventDefault();
+                commentsSection.restart();
+                let parentId = $(this).attr("parentId");
+                $(`[createCommentparentId="${parentId}"]`).hide();
+            })
+
+            $(".createCommentCmd").off();
+            $(".createCommentCmd").click(function (event) {
+                event.preventDefault();
+                let parentId = $(this).attr("parentId");
+                let commentText = $(this).parent().parent().find("textarea").val();
+                commentsSection.postCommand("/Photos/CreateComment", { parentId, commentText });
+                commentsSection.restart();
+            })
+            $(".CreateResponseCommentCmd").off();
+            $(".CreateResponseCommentCmd").click(function () {
+                commentsSection.pause();
+                let parentId = $(this).attr("parentId");
+                console.log($(`[createResponseparentId="${parentId}"]`)[0])
+                $(`[createResponseparentId="${parentId}"]`).show();
+                $(`[createResponseparentId="${parentId}"] > textarea`).val("");
+                $('#content').animate({
+                    scrollTop: $(`[createResponseparentId="${parentId}"] > textarea`).offset().top
+                }, scrollAnimationSpeed)
+                    .promise()
+                    .done(() => { $(`[createResponseparentId="${parentId}"] > textarea`).focus(); });
+
+            })
+            $(".abortCreateResponseCmd").off();
+            $(".abortCreateResponseCmd").click(function (event) {
+                event.preventDefault();
+                commentsSection.restart();
+                let parentId = $(this).attr("parentId");
+                $(`[createResponseparentId="${parentId}"]`).hide();
+            })
+
+            $(".createResponseCmd").off();
+            $(".createResponseCmd").click(function (event) {
+                event.preventDefault();
+                let parentId = $(this).attr("parentId");
+                let commentText = $(this).parent().parent().find("textarea").val();
+                commentsSection.postCommand("/Photos/CreateComment", { parentId, commentText });
+                commentsSection.restart();
+            })
+            $(".editCommentCmd").off();
+            $(".editCommentCmd").click(function () {
+                commentsSection.pause();
+                let id = $(this).attr("commentId");
+                $("#" + id).show();
+                $("#" + id + "> textarea").focus();
+                $("[commentId=" + id + "]").hide();
+            })
+
+            $(".abortEditCommentCmd").off();
+            $(".abortEditCommentCmd").click(function (event) {
+                event.preventDefault();
+                commentsSection.restart();
+                let id = $(this).attr("cmdCommentId");
+                $("#" + id).hide();
+                $("[commentId=" + id + "]").show();
+            })
+
+            $(".updateCommentCmd").off();
+            $(".updateCommentCmd").click(function (event) {
+                event.preventDefault();
+                let commentId = $(this).attr("cmdCommentId");
+                let commentText = $(this).parent().parent().find("textarea").val();
+                commentsSection.postCommand("/Photos/UpdateComment", { commentId, commentText });
+                commentsSection.restart();
+            })
+
+            $(".deleteCommentCmd").off()
+            $(".deleteCommentCmd").click(function (event) {
+                event.preventDefault();
+                commentsSection.pause();
+                let commentId = $(this).attr("cmdCommentId");
+                commentsSection.confirmedCommand("Effacer?", `/Photos/DeleteComment?id=${commentId}`);
+                commentsSection.restart();
+            })
+        }
+    </script>
+}
+

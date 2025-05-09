@@ -1,0 +1,44 @@
+﻿
+@model IEnumerable<PhotosManager.Models.Photo>
+@{
+    var connectedUser = (PhotosManager.Models.User)Session["ConnectedUser"];
+}
+
+@foreach (var photo in Model)
+{
+    if (connectedUser.IsAdmin || photo.Shared || photo.OwnerId == connectedUser.Id)
+    {
+        bool userLike = PhotosManager.Models.DB.Likes.ToList().Exists(l => (l.PhotoId == photo.Id && l.UserId == connectedUser.Id));
+        bool userComment = PhotosManager.Models.DB.Comments.ToList().Exists(l => (l.PhotoId == photo.Id && l.OwnerId == connectedUser.Id));
+
+        string photoLikedByConnectedUser = userLike ? "fa" : "fa-regular";
+        string photoCommentByConnectedUser = userComment ? "fa-solid" : "fa-regular";
+
+        bool writeAccess = connectedUser.IsAdmin || photo.OwnerId == connectedUser.Id;
+        <div class="photoLayout">
+            <div class="photoTitleContainer" title="@photo.Description">
+                <div class="photoTitle ellipsis">@photo.Title</div>
+            </div>
+            <a href="/Photos/Details/@photo.Id" title="Afficher les détails de @photo.Title" class="photDetailsLink">
+                <div class="photoImage" style="background-image:url('@photo.Image')">
+                    <div class="UserSmallAvatar transparentBackground" style="background-image: url('@photo.Owner.Avatar')" title="@photo.Owner.Name"></div>
+                    @if (writeAccess && photo.Shared)
+                    {
+                        <div class="UserSmallAvatar transparentBackground" style="background-image:url('/Content/UI-Images/shared.png')" title="partagée"></div>
+                    }
+                </div>
+                <div class="photoCreationDate">
+                    @Helper.When(photo.CreationDate)
+
+                    <div class="likesSummary">
+                        @photo.Comments.Count()
+                        <i class=" cmdIconSmall @photoCommentByConnectedUser fa-comment" title="@photo.UsersCommentList"></i>
+                        @photo.LikesCount
+                        <i class="cmdIconSmall @photoLikedByConnectedUser fa-thumbs-up" title="@photo.UsersLikesList" photoid="@photo.Id"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+    }
+}
+

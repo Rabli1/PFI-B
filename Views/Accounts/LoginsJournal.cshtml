@@ -1,0 +1,19 @@
+﻿@model IEnumerable<PhotosManager.Models.Login>
+
+@{
+    ViewBag.Title = "Journal des connexions";
+}
+
+<div class="formLayout">
+    <div id="LoginsListContainer"><!-- Periodicaly refreshed --></div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(() => {
+            let pr = new AutoRefreshedPanel("LoginsListContainer", "/Accounts/GetLoginsList",  5);
+        })
+    </script>
+}
+

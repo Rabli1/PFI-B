@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "Liste des photos";
+}
+
+<div id="PhotosPanel" class='photosLayout'> <!-- Auto refreshed panel --></div>
+
+@section Scripts {
+    <script>
+
+        $(() => {
+            let PhotosPanel = new AutoRefreshedPanel("PhotosPanel", "/Photos/GetPhotos", GPRR, attachEvent);
+
+            function attachEvent() {
+                $("#PhotosPanel .fa-thumbs-up").off();
+                $("#PhotosPanel .fa-thumbs-up").click(function (e) {
+                    PhotosPanel.command("/Photos/TogglePhotoLike/" + $(this).attr("photoId"));
+                    e.preventDefault();
+                });
+            }
+        })
+
+    </script>
+}
