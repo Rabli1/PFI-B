@@ -2,6 +2,8 @@
 @model IEnumerable<PhotosManager.Models.Photo>
 @{
     var connectedUser = (PhotosManager.Models.User)Session["ConnectedUser"];
+    bool showSearch = Session["PhotosShowSearch"] != null && (bool)Session["PhotosShowSearch"];
+
 }
 
 @foreach (var photo in Model)
@@ -41,4 +43,3 @@
         </div>
     }
 }
-

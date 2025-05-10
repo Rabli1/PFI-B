@@ -5,6 +5,12 @@
     var connectedUser = connected ? (PhotosManager.Models.User)Session["ConnectedUser"] : null;
     bool admin = connected ? connectedUser.Admin : false;
     string sortType = Session["PhotosSortType"] != null ? (string)Session["PhotosSortType"] : "date";
+    bool asc = Session["PhotosSortAsc"] != null && (bool)Session["PhotosSortAsc"];
+    string arrowClass = asc ? "fa-arrow-circle-up" : "fa-arrow-circle-down";
+    string tooltipSort = asc ? "Tri descendant" : "Tri ascendant";
+    bool showSearch = Session["PhotosShowSearch"] != null && (bool)Session["PhotosShowSearch"];
+    string tooltipSearch = showSearch ? "Masquer la barre de recherche" : "Afficher la barre de recherche";
+
 }
 
 <div id="header" class="grid">
@@ -18,67 +24,35 @@
             <div class="actionTitle">Photos </div>
 
             <div class="menu-icon-layout">
+
+
+                <a href="@Url.Action("ToggleSortDirection", "Photos")"
+                   class="noDecoration"
+                   title="@tooltipSort">
+                    <i class="cmdIcon fa @arrowClass"></i>
+                </a>
                 @if (connected)
                 {
                     <a href="/Photos/Create" class="cmdIcon fa fa-plus" title="Ajouter une photo"></a>
                 }
 
-                <a href="/Photos/ToggleSortDirection" class="cmdIcon fa fa-arrow-circle-down" title="Tri ascendant"></a>
+                <a href="javascript:void(0);" onclick="loadSearchBar()"
+                   class="cmdIcon fa fa-search"
+                   title="Afficher la recherche">
 
-                <div class="dropdown">
-                    <div data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="cmdIcon fa fa-search" title="Recherche par mots-clés"></i>
-                    </div>
-                    <div class="dropdown-menu noselect" style="padding: 10px; min-width: 250px;">
-                        <form action="/Photos/SetSearchKeywords" method="get" style="display:flex; align-items:center;">
-                            <input type="text" name="keywords"
-                                   class="form-control"
-                                   style="height:28px; font-size:0.85em;"
-                                   placeholder="Rechercher..."
-                                   value="@Session["searchKeywords"]" />
-                            <button type="submit"
-                                    class="cmdIcon fa fa-check"
-                                    style="margin-left:5px; background:none; border:none;"
-                                    title="Rechercher"></button>
-                            @if (!string.IsNullOrEmpty((string)Session["searchKeywords"]))
-                            {
-                                <a href="/Photos/SetSearchKeywords?keywords=" class="cmdIcon fa fa-times" style="margin-left:5px;" title="Réinitialiser la recherche"></a>
-                            }
-                        </form>
-                    </div>
-                </div>
+                </a>
 
+                @if (connected)
+                {
+                    <a href="/Accounts/EditProfil" class="noDecoration">
+                        @Helper.Image(connectedUser.Avatar, "UserHeaderAvatar ")
+                    </a>
+                }
                 <div class="dropdown">
                     <div data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="cmdIcon fa fa-ellipsis-vertical"></i>
                     </div>
                     <div class="dropdown-menu noselect">
-
-                        <!-- Tri dynamique -->
-                        <a href="/Photos/List?sortType=date" class="dropdown-item">
-                            <i class="menuIcon @(sortType=="date" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
-                            <i class="menuIcon fa fa-calendar mx-2"></i> par date de création
-                        </a>
-                        <a href="/Photos/List?sortType=likes" class="dropdown-item">
-                            <i class="menuIcon @(sortType=="likes" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
-                            <i class="menuIcon fa fa-heart mx-2"></i> par popularité
-                        </a>
-                        <a href="/Photos/List?sortType=keywords" class="dropdown-item">
-                            <i class="menuIcon @(sortType=="keywords" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
-                            <i class="menuIcon fa fa-search mx-2"></i> par mots-clés
-                        </a>
-                        <a href="/Photos/List?sortType=user" class="dropdown-item">
-                            <i class="menuIcon @(sortType=="user" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
-                            <i class="menuIcon fa fa-users mx-2"></i> par créateur
-                        </a>
-                        <a href="/Photos/List?sortType=owner" class="dropdown-item">
-                            <i class="menuIcon @(sortType=="owner" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
-                            <i class="menuIcon fa fa-user mx-2"></i> mes photos
-                        </a>
-
-                        <div class="dropdown-divider"></div>
-
-                        <!-- Compte -->
                         @if (connected)
                         {
                             <div class="dropdown-item">
@@ -105,6 +79,56 @@
                                 </a>
                             </div>
                         }
+                        <div class="dropdown-divider"></div>
+
+                        <a href="/Photos/ToggleSortDirection" class="dropdown-item">
+                            <i class="menuIcon fa fa-image mx-2"></i>
+                            Liste des photos [tri descendant]
+                        </a>
+
+                        <a href="/Photos/List?sortType=date" class="dropdown-item">
+                            <i class="menuIcon @(sortType == "date" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
+                            <i class="menuIcon fa fa-calendar mx-2"></i>
+                            par date de création
+                        </a>
+
+                        <a href="/Photos/List?sortType=likes" class="dropdown-item">
+                            <i class="menuIcon @(sortType == "likes" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
+                            <i class="menuIcon fa fa-heart mx-2"></i>
+                            par popularité
+                        </a>
+
+                        <a href="/Photos/List?sortType=comments" class="dropdown-item">
+                            <i class="menuIcon @(sortType == "comments" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
+                            <i class="menuIcon fa fa-comment mx-2"></i>
+                            par nombre de commentaires
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a href="/Photos/List?sortType=ownerDontLike" class="dropdown-item">
+                            <i class="menuIcon @(sortType == "ownerDontLike" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
+                            <i class="menuIcon fa fa-regular fa-thumbs-up mx-2"></i>
+                            que je n'aime pas
+                        </a>
+
+                        <a href="/Photos/List?sortType=ownerLikes" class="dropdown-item">
+                            <i class="menuIcon @(sortType == "ownerLikes" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
+                            <i class="menuIcon fa fa-thumbs-up mx-2"></i>
+                            que j'aime
+                        </a>
+
+                        <a href="/Photos/List?sortType=ownerNoComment" class="dropdown-item">
+                            <i class="menuIcon @(sortType == "ownerNoComment" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
+                            <i class="menuIcon fa fa-regular fa-comment mx-2"></i>
+                            que je n'ai pas commenté
+                        </a>
+
+                        <a href="/Photos/List?sortType=ownerComments" class="dropdown-item">
+                            <i class="menuIcon @(sortType == "ownerComments" ? "fa fa-check" : "fa fa-fw") mx-2"></i>
+                            <i class="menuIcon fa fa-comment mx-2"></i>
+                            que j'ai commenté
+                        </a>
 
                         <div class="dropdown-divider"></div>
 
@@ -116,6 +140,7 @@
                     </div>
                 </div>
             </div>
+
             break;
         case "details":
             <div class="actionTitle">Détails </div>

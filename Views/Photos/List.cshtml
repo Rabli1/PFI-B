@@ -1,7 +1,10 @@
 ﻿
 @{
     ViewBag.Title = "Liste des photos";
+    bool showSearch = Session["PhotosShowSearch"] != null && (bool)Session["PhotosShowSearch"];
+
 }
+<div id="search-container"></div>
 
 <div id="PhotosPanel" class='photosLayout'> <!-- Auto refreshed panel --></div>
 
@@ -20,5 +23,45 @@
             }
         })
 
+
+    function submitSearchForm(event) {
+        event.preventDefault();
+
+        const form = document.getElementById("searchForm");
+        const formData = new FormData(form);
+
+        fetch('@Url.Action("SetSearchKeywords", "Photos")', {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                searchToken: formData.get("searchToken"),
+                selectedUserId: parseInt(formData.get("selectedUserId"))
+            })
+        })
+        .then(res => res.json())
+        .then(() => {
+            refreshPhotoList();
+        });
+    }
+
+    function refreshPhotoList() {
+        fetch('@Url.Action("GetPhotos", "Photos", new { forceRefresh = true })')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("photos-container").innerHTML = html;
+            });
+    }
+
+    function hideSearchBar() {
+        document.getElementById("search-container").innerHTML = "";
+    }
+
+    function loadSearchBar() {
+        fetch('@Url.Action("ToggleSearchPartial", "Photos")')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById("search-container").innerHTML = html;
+            });
+    }
     </script>
 }
