@@ -9,6 +9,30 @@
     string arrowClass = asc ? "fa-arrow-circle-up" : "fa-arrow-circle-down";
     string tooltipSort = asc ? "Tri descendant" : "Tri ascendant";
     Session["ShowSearch"] = Session["ShowSearch"] ?? false;
+
+    string[] sortTypes = new[] { "date", "likes", "comments" };
+    int currentSortIndex = Array.IndexOf(sortTypes, sortType);
+    int nextSortIndex = (currentSortIndex + 1) % sortTypes.Length;
+    string nextSortType = sortTypes[nextSortIndex];
+
+    var sortIcons = new Dictionary<string, string>
+    {
+        { "date", "fa-calendar" },
+        { "likes", "fa-thumbs-up" },
+        { "comments", "fa-comment" }
+    };
+
+    var sortTitles = new Dictionary<string, string>
+    {
+        { "date", "Tri par date de création" },
+        { "likes", "Tri par popularité" },
+        { "comments", "Tri par nombre de commentaires" }
+    };
+
+    string currentIcon = sortIcons.ContainsKey(sortType) ? sortIcons[sortType] : "fa-calendar";
+    string currentTitle = sortTitles.ContainsKey(sortType) ? sortTitles[sortType] : "Tri par date de création";
+
+
 }
 
 <div id="header" class="grid">
@@ -26,6 +50,12 @@
             <div class="actionTitle">Photos </div>
 
             <div class="menu-icon-layout">
+                <a href="/Photos/List?sortType=@nextSortType"
+                   class="cmdIcon fa @currentIcon"
+                   title="@currentTitle">
+                </a>
+
+
 
 
                 <a href="@Url.Action("ToggleSortDirection", "Photos")"
@@ -57,6 +87,7 @@
                     <div data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="cmdIcon fa fa-ellipsis-vertical"></i>
                     </div>
+
                     <div class="dropdown-menu noselect">
                         @if (connected)
                         {
