@@ -111,6 +111,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\PhotosController.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\CommentsRepository.cs" />
@@ -118,6 +119,8 @@
     <Compile Include="Models\LikesRepository.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\LoginsRepository.cs" />
+    <Compile Include="Models\Notification.cs" />
+    <Compile Include="Models\NotificationsRepository.cs" />
     <Compile Include="Models\Photo.cs" />
     <Compile Include="Models\PhotosRepository.cs" />
     <Compile Include="WebServices\Countries.cs" />
@@ -194,6 +197,7 @@
     <Content Include="App_Data\UnverifiedEmails.json" />
     <Content Include="App_Data\Users.json" />
     <Content Include="App_Data\Comments.json" />
+    <Content Include="App_Data\Notifications.json" />
     <None Include="Properties\PublishProfiles\PhotosManager2025 - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\imageControl-2.0.js" />

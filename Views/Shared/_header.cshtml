@@ -39,8 +39,14 @@
                 <a href="javascript:void(0);" onclick="loadSearchBar()"
                    class="cmdIcon fa fa-search"
                    title="Afficher la recherche">
-
                 </a>
+
+                <div class="dropdown">
+                    <div data-bs-toggle="dropdown" aria-expanded="false">
+                        <i id="notificationsIcon" class="cmdIcon fa fa-regular fa-bell"></i>
+                    </div>
+                    <div id="notificationsPanel" class="dropdown-menu noselect"> </div>
+                </div>
 
                 @if (connected)
                 {
@@ -52,6 +58,7 @@
                     <div data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="cmdIcon fa fa-ellipsis-vertical"></i>
                     </div>
+
                     <div class="dropdown-menu noselect">
                         @if (connected)
                         {

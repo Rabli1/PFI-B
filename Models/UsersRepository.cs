@@ -141,6 +141,16 @@ namespace PhotosManager.Models
                 Update((User)user);
             }
         }
+        public void SetNotifications(int userId, bool notifications)
+        {
+            User user = Get(userId);
+            if (user != null)
+            {
+                ((User)user).Notifications = notifications;
+                Update((User)user);
+            }
+        }
+
         public override int Add(User user)
         {
             user.Password = HashPassword(user.Password);

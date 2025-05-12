@@ -120,3 +120,38 @@ function ajaxActionCall(actionLink) {
     });
 }
 
+
+function noTimeout() {
+    initSessionTimeout((20 * 60) - 60);
+}
+
+function startCountdown() {
+    if (!initialized)
+        initTimeout();
+    clearTimeout(currentTimeouID);
+    $(".popup").hide();
+    timeLeft = maxStallingTime;
+    if (timeLeft != infinite) {
+        currentTimeouID = setInterval(() => {
+            timeLeft = timeLeft - 1;
+            if (timeLeft > 0) {
+                if (timeLeft <= 10) {
+                    $(".popup").show();
+                    $("#popUpMessage").text("Expiration dans " + timeLeft + " secondes");
+                }
+            } else {
+                $("#popUpMessage").text('Redirection dans ' + (timeBeforeRedirect + timeLeft) + " secondes");
+                if (timeLeft <= -timeBeforeRedirect) {
+                    clearTimeout(currentTimeouID);
+                    closePopup();
+                    timeoutCallBack();
+                }
+            }
+        }
+            , 1000);
+    }
+}
+function closePopup() {
+    $(".popup").hide();
+    startCountdown();
+}

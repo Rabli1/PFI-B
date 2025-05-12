@@ -37,7 +37,8 @@ namespace PhotosManager.Models
 
         static public Repository<RenewPasswordCommand> RenewPasswordCommands { get; set; }
             = new Repository<RenewPasswordCommand>();
-
+        static public NotificationsRepository Notifications { get; set; }
+            = new NotificationsRepository();
         #endregion
     }
 }

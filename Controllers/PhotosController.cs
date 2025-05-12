@@ -292,9 +292,27 @@ namespace PhotosManager.Controllers
         public ActionResult TogglePhotoLike(int id)
         {
             User connectedUser = (User)Session["ConnectedUser"];
+            Photo photo = DB.Photos.Get(id);
+
+            bool alreadyLiked = DB.Likes.ToList().Any(l => l.PhotoId == id && l.UserId == connectedUser.Id);
+
             DB.Likes.ToggleLike(id, connectedUser.Id);
+
+            string action = alreadyLiked ? "n'aime pas" : "aime";
+            string message = $"{connectedUser.Name} {action} votre photo [{photo.Title}]";
+
+                DB.Notifications.Add(new Notification
+                {
+                    TargetUserId = photo.OwnerId,
+                    Message = message,
+                    Created = DateTime.Now,
+                });
+
             return null;
         }
+
+
+
         public ActionResult Comments(int photoId, int parentId = 0)
         {
             List<Comment> comments = DB.Comments.ToList().Where(c => c.PhotoId == photoId && c.ParentId == parentId).ToList();
@@ -316,16 +334,35 @@ namespace PhotosManager.Controllers
         [HttpPost]
         public ActionResult CreateComment(int parentId, string commentText)
         {
-            User connectedUser = ((User)Session["ConnectedUser"]);
-            Comment comment = new Comment();
-            comment.ParentId = parentId;
-            comment.PhotoId = (int)Session["currentPhotoId"];
-            comment.OwnerId = connectedUser.Id;
-            comment.Text = commentText;
-            comment.CreationDate = DateTime.Now;
+            User connectedUser = (User)Session["ConnectedUser"];
+            int photoId = (int)Session["currentPhotoId"];
+            Photo photo = DB.Photos.Get(photoId);
+
+            Comment comment = new Comment
+            {
+                ParentId = parentId,
+                PhotoId = photoId,
+                OwnerId = connectedUser.Id,
+                Text = commentText,
+                CreationDate = DateTime.Now
+            };
+
             DB.Comments.Add(comment);
+
+                string message = $"{connectedUser.Name} a commenté votre photo \"{photo.Title}\"";
+
+                DB.Notifications.Add(new Notification
+                {
+                    TargetUserId = photo.OwnerId,
+                    Message = message,
+                    Created = DateTime.Now
+                });
+
             return null;
         }
+
+
+
         [HttpPost]
         public ActionResult UpdateComment(int commentId, string commentText)
         {
@@ -341,9 +378,27 @@ namespace PhotosManager.Controllers
         public ActionResult ToggleCommentLike(int id)
         {
             User connectedUser = (User)Session["ConnectedUser"];
+            Comment comment = DB.Comments.Get(id);
+
+            bool alreadyLiked = DB.Likes.ToList().Any(l => l.CommentId == id && l.UserId == connectedUser.Id);
+
             DB.Likes.ToggleCommentLike(id, connectedUser.Id);
+
+                string action = alreadyLiked ? "n'aime plus" : "aime";
+
+                string message = $"{connectedUser.Name} {action} un de vos commentaire";
+
+                DB.Notifications.Add(new Notification
+                {
+                    TargetUserId = comment.OwnerId,
+                    Message = message,
+                    Created = DateTime.Now
+                });
+
             return null;
         }
+
+
         public ActionResult DeleteComment(int id)
         {
             User connectedUser = ((User)Session["ConnectedUser"]);

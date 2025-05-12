@@ -57,6 +57,7 @@ namespace PhotosManager.Models
         public bool Admin { get; set; }
         public bool Blocked { get; set; }
         public bool Verified { get; set; }
+        public bool Notifications { get; set; }
 
         [ImageAsset(Avatars_Folder, Default_Avatar)]
         public string Avatar { get; set; } = DefaultImage;
@@ -69,6 +70,8 @@ namespace PhotosManager.Models
         public bool IsBlocked { get { return Blocked; } }
         [JsonIgnore]
         public bool IsOnline { get { return Online; } }
+        [JsonIgnore]
+        public bool hasNotifications { get { return Notifications; } }
         #endregion
 
         [JsonIgnore]
