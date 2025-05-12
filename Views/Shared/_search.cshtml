@@ -1,0 +1,34 @@
+﻿@{
+    bool showSearch = Session["ShowSearch"] != null && (bool)Session["ShowSearch"];
+    var selectedUser = Session["SelectedUser"] != null ? (int)Session["SelectedUser"] : 0;
+    List<User> users = DB.Users.ToList();
+    bool connected = Session["ConnectedUser"] != null;
+    var connectedUser = connected ? (PhotosManager.Models.User)Session["ConnectedUser"] : null;
+}
+@if (showSearch)
+{
+    <div id="search">
+        <div style="display:grid; grid-template-columns:auto auto; gap:8px;">
+            <input type="search" placeholder="mot-clés" name="searchToken" id="searchToken" class="form-control" value="@Session["SetSearchKeywords"]">
+            <select name="SelectedUser" id="SelectedUser" class="form-control" multiselect="">
+                <option value="0" selected="">Toutes les photos (@DB.Photos.ToList().Count()) </option>
+                <option value="@connectedUser.Id">Mes photos (@DB.Photos.ToList().Count(photo => photo.OwnerId == connectedUser.Id))</option>
+                <hr>
+                @foreach (var user in users)
+                {
+                    int photoCount = DB.Photos.ToList().Count(photo => photo.OwnerId == user.Id);
+
+                    string selected = user.Id == selectedUser ? "selected" : "";
+                    if (connectedUser.Id != user.Id)
+                    {
+                        <option value="@user.Id" @selected>@user.Name (@photoCount)</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="menu-icon-layout">
+            <a href="/Photos/ToggleSearch" class="cmdIcon fa fa-times" title="Fermer la barre de recherche"></a>
+        </div>
+    </div>
+}

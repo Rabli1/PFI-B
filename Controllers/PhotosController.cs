@@ -23,23 +23,22 @@ namespace PhotosManager.Controllers
             string sortType = Session[SortTypeKey]?.ToString() ?? "date";
             return RedirectToAction("List", new { sortType = sortType });
         }
-        public ActionResult ToggleSearchPartial()
+        public ActionResult ToggleSearch()
         {
-            return PartialView("_SearchBar");
-        }
-
-
-        public ActionResult SetPhotoOwnerSearchId(int id)
-        {
-            Session["photoOwnerSearchId"] = id;
+            Session["ShowSearch"] = !(bool)Session["ShowSearch"];
             return RedirectToAction("List");
         }
 
-        public ActionResult SetSearchKeywords(string searchToken, int selectedUserId = 0)
+        public ActionResult SetSearchKeywords(string keywords)
         {
-            Session["searchKeywords"] = searchToken;
-            Session["photoOwnerSearchId"] = selectedUserId;
-            return Json(new { success = true });
+            Session["SetSearchKeywords"] = keywords;
+            return RedirectToAction("List");
+        }
+
+        public ActionResult SetPhotoOwnerSearchId(int id)
+        {
+            Session["SetPhotoOwnerSearchId"] = id;
+            return RedirectToAction("List");
         }
 
 
@@ -52,19 +51,11 @@ namespace PhotosManager.Controllers
 
                 List<Photo> photos = DB.Photos.ToList();
                 User connectedUser = (User)Session["ConnectedUser"];
-                int selectedUserId = Session["photoOwnerSearchId"] != null ? (int)Session["photoOwnerSearchId"] : 0;
                 string sortType = Session["PhotosSortType"]?.ToString() ?? "date";
-                string keywords = Session["searchKeywords"]?.ToString().ToLower() ?? "";
                 bool asc = Session["PhotosSortAsc"] != null && (bool)Session["PhotosSortAsc"];
+                int selectedUser = Session["SetPhotoOwnerSearchId"] != null ? (int)Session["SetPhotoOwnerSearchId"] : 0;
+                string keyword = Session["SetSearchKeywords"] != null ? Session["SetSearchKeywords"].ToString() : string.Empty;
 
-                if (selectedUserId == 1 && connectedUser != null)
-                {
-                    photos = photos.Where(p => p.OwnerId == connectedUser.Id).ToList();
-                }
-                else if (selectedUserId > 1)
-                {
-                    photos = photos.Where(p => p.OwnerId == selectedUserId).ToList();
-                }
 
 
                 switch (sortType)
@@ -79,25 +70,6 @@ namespace PhotosManager.Controllers
                         photos = asc
                             ? photos.OrderBy(p => p.Comments.Count).ToList()
                             : photos.OrderByDescending(p => p.Comments.Count).ToList();
-                        break;
-
-                    case "keywords":
-                        if (!string.IsNullOrWhiteSpace(keywords))
-                        {
-                            var filtered = photos.Where(p =>
-                                (!string.IsNullOrEmpty(p.Title) && p.Title.ToLower().Contains(keywords)) ||
-                                (!string.IsNullOrEmpty(p.Description) && p.Description.ToLower().Contains(keywords)));
-
-                            photos = asc
-                                ? filtered.OrderBy(p => p.CreationDate).ToList()
-                                : filtered.OrderByDescending(p => p.CreationDate).ToList();
-                        }
-                        break;
-
-                    case "user":
-                        photos = asc
-                            ? photos.OrderBy(p => p.Owner.Name).ThenBy(p => p.CreationDate).ToList()
-                            : photos.OrderByDescending(p => p.Owner.Name).ThenByDescending(p => p.CreationDate).ToList();
                         break;
 
                     case "owner":
@@ -158,6 +130,21 @@ namespace PhotosManager.Controllers
                         break;
                 }
 
+                if (Session["ShowSearch"] != null && (bool)Session["ShowSearch"])
+                {
+                    if (!string.IsNullOrEmpty(keyword))
+                    {
+                        keyword = keyword.ToLower();
+                        photos = photos.Where(p => p.Title.ToLower().Contains(keyword) || p.Description.ToLower().Contains(keyword)).ToList();
+                    }
+
+                    if (selectedUser > 0)
+                    {
+                        photos = photos.Where(p => p.OwnerId == selectedUser).ToList();
+                    }
+                }
+
+
                 return PartialView(photos);
             }
 
@@ -193,8 +180,6 @@ namespace PhotosManager.Controllers
 
             return View();
         }
-
-
         public ActionResult Create()
         {
             return View(new Photo());
@@ -298,7 +283,7 @@ namespace PhotosManager.Controllers
 
             DB.Likes.ToggleLike(id, connectedUser.Id);
 
-            string action = alreadyLiked ? "n'aime pas" : "aime";
+            string action = alreadyLiked ? "n'aime plus" : "aime";
             string message = $"{connectedUser.Name} {action} votre photo [{photo.Title}]";
 
                 DB.Notifications.Add(new Notification

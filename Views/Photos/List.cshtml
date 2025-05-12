@@ -4,7 +4,6 @@
     bool showSearch = Session["PhotosShowSearch"] != null && (bool)Session["PhotosShowSearch"];
 
 }
-<div id="search-container"></div>
 
 <div id="PhotosPanel" class='photosLayout'> <!-- Auto refreshed panel --></div>
 
@@ -14,54 +13,37 @@
         $(() => {
             let PhotosPanel = new AutoRefreshedPanel("PhotosPanel", "/Photos/GetPhotos", GPRR, attachEvent);
 
+            var timeout = null;
+            $('#searchToken').keyup(function () {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    PhotosPanel.command("/Photos/SetSearchKeywords?keywords=" + $(this).val());
+                }, 1000);
+            });
+
             function attachEvent() {
-                $("#PhotosPanel .fa-thumbs-up").off();
                 $("#PhotosPanel .fa-thumbs-up").click(function (e) {
                     PhotosPanel.command("/Photos/TogglePhotoLike/" + $(this).attr("photoId"));
                     e.preventDefault();
                 });
             }
-        })
-
-
-    function submitSearchForm(event) {
-        event.preventDefault();
-
-        const form = document.getElementById("searchForm");
-        const formData = new FormData(form);
-
-        fetch('@Url.Action("SetSearchKeywords", "Photos")', {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                searchToken: formData.get("searchToken"),
-                selectedUserId: parseInt(formData.get("selectedUserId"))
+            $('#searchToken').change(function () {
+                PhotosPanel.command("/Photos/SetSearchKeywords?keywords=" + $(this).val());
+            });
+            $('#searchToken').on("search", function () {
+                PhotosPanel.command("/Photos/SetSearchKeywords?keywords=" + $(this).val());
+            });
+            // ascending sort of select option values
+            /*$("#SelectedUser").html($("#SelectedUser option").sort(function (a, b) {
+                return a.text == b.text ? 0 : a.text > b.text ? 1 : -1
+            }))*/
+            $('#SelectedUser').change(function () {
+                PhotosPanel.command("/Photos/SetPhotoOwnerSearchId?id=" + $(this).val());
             })
+
+            $("#SelectedUser option").each(function () {
+                //$(this).text($(this).text().slice($(this).text().indexOf("-")+2));
+            });
         })
-        .then(res => res.json())
-        .then(() => {
-            refreshPhotoList();
-        });
-    }
-
-    function refreshPhotoList() {
-        fetch('@Url.Action("GetPhotos", "Photos", new { forceRefresh = true })')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById("photos-container").innerHTML = html;
-            });
-    }
-
-    function hideSearchBar() {
-        document.getElementById("search-container").innerHTML = "";
-    }
-
-    function loadSearchBar() {
-        fetch('@Url.Action("ToggleSearchPartial", "Photos")')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById("search-container").innerHTML = html;
-            });
-    }
     </script>
 }

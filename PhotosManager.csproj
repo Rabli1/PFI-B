@@ -251,7 +251,7 @@
     <Content Include="Views\Photos\GetPhotos.cshtml" />
     <Content Include="Views\Photos\GetDetails.cshtml" />
     <Content Include="Views\Photos\RenderComments.cshtml" />
-    <Content Include="Views\Shared\_SearchBar.cshtml" />
+    <Content Include="Views\Shared\_search.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
